@@ -2,9 +2,10 @@
 import { notFound } from 'next/navigation';
 import { getMenus } from '@/services/menuService';
 
-export default async function MenuDetailPage({ params }: { params: { id: string } }) {
+export default async function MenuDetailPage(props: any) {
+  const { id } = props.params;
   const menus = await getMenus();
-  const menu = menus.find((item) => item.id === params.id);
+  const menu = menus.find((item) => item.id === id);
 
   if (!menu) return notFound();
 
