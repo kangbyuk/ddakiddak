@@ -2,11 +2,7 @@
 import { notFound } from 'next/navigation';
 import { getMenus } from '@/services/menuService';
 
-type Props = {
-  params: { id: string };
-};
-
-export default async function MenuDetailPage({ params }: Props) {
+export default async function MenuDetailPage({ params }: { params: { id: string } }) {
   const menus = await getMenus();
   const menu = menus.find((item) => item.id === params.id);
 
