@@ -1,52 +1,54 @@
 'use client';
 
-import { useState } from 'react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '@/firebase';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
 
-export default function LoginPage() {
-  const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [pw, setPw] = useState('');
-  const [error, setError] = useState('');
+export default function Home() {
+  const [menus, setMenus] = useState<any[]>([]);
 
-  const handleLogin = async () => {
-    try {
-      await signInWithEmailAndPassword(auth, email, pw);
-      router.push('/admin/upload');
-    } catch (err) {
-      setError('로그인 실패: 이메일/비밀번호를 확인하세요');
-    }
-  };
+  useEffect(() => {
+    const fetchMenus = async () => {
+      const res = await fetch('/api/menus');
+      const data = await res.json();
+      setMenus(data);
+    };
+    fetchMenus();
+  }, []);
 
   return (
-    <main className="max-w-sm mx-auto py-20 px-4">
-      <h1 className="text-2xl font-bold mb-6">🔐 관리자 로그인</h1>
+    <main className="flex flex-col items-center justify-center min-h-screen bg-black text-white p-6">
+      <h1 className="text-3xl font-bold mb-2">🍗 딱이닭</h1>
+      <p className="text-sm text-neutral-400 mb-4">오늘은 이 치킨으로 딱이닭!</p>
 
-      <input
-        type="email"
-        placeholder="이메일"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className="w-full border p-2 mb-3 rounded"
-      />
-      <input
-        type="password"
-        placeholder="비밀번호"
-        value={pw}
-        onChange={(e) => setPw(e.target.value)}
-        className="w-full border p-2 mb-3 rounded"
-      />
+      <div className="w-full max-w-md">
+        <Swiper
+          modules={[Navigation]}
+          navigation
+          spaceBetween={30}
+          slidesPerView={1}
+          loop
+          className="rounded-xl overflow-hidden"
+        >
+          {menus.map((menu) => (
+            <SwiperSlide key={menu.id}>
+              <div className="bg-white text-black p-4 rounded-xl shadow-md">
+                <img src={menu.image} alt={menu.name} className="w-full h-60 object-cover rounded-md" />
+                <h2 className="text-lg font-semibold mt-2 text-center">{menu.name}</h2>
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
 
       <button
-        onClick={handleLogin}
-        className="bg-black text-white px-4 py-2 rounded w-full"
+        onClick={() => window.location.reload()}
+        className="mt-6 px-4 py-2 bg-white text-black text-sm font-semibold rounded hover:bg-neutral-200"
       >
-        로그인
+        🔄 새로운 치킨 불러오기
       </button>
-
-      {error && <p className="text-red-600 text-sm mt-3">{error}</p>}
     </main>
   );
 }
